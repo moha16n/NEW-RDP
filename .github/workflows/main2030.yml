@@ -10,23 +10,19 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Download Pagekite
-      run: |
-        Invoke-WebRequest -Uri "https://pagekite.net/pk/pagekite.py" -OutFile "pagekite.py"
-        python --version
-      shell: pwsh
+      - name: Download Pagekite
+        run: |
+          Invoke-WebRequest -Uri "https://pagekite.net/pk/pagekite.py" -OutFile "pagekite.py"
+          python --version
+        shell: pwsh
 
-    - name: Start Pagekite tunnel
-      id: pagekite
-      run: |
-        python pagekite.py 3389 yoursubdomain.pagekite.me --clean &
+      - name: Start Pagekite tunnel
+        id: pagekite
+        run: |
+          Start-Process -NoNewWindow -FilePath "python" -ArgumentList "pagekite.py 3389 yoursubdomain.pagekite.me --clean"
+          Start-Sleep -Seconds 10
+          Write-Output "Pagekite tunnel started at yoursubdomain.pagekite.me:3389"
+        shell: pwsh
 
-        # انتظر 10 ثواني ليشتغل النفق
-        Start-Sleep -Seconds 10
-
-        # حفظ العنوان (في حالة تحتاج جلبه من أي مصدر)
-        echo "Pagekite tunnel started at yoursubdomain.pagekite.me:3389"
-      shell: pwsh
-
-    - name: Show RDP info
-      run: echo "اتصل باستخدام RDP إلى: yoursubdomain.pagekite.me:3389"
+      - name: Show RDP info
+        run: echo "اتصل باستخدام RDP إلى: MyRDP.pagekite.me:3389"
