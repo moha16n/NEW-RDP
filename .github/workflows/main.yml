@@ -1,0 +1,37 @@
+name: Secure Free RDP with Remote.it
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Enable RDP & Add User
+      run: |
+        net user admin123 123456 /add
+        net localgroup administrators admin123 /add
+        reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\' -name "fDenyTSConnections" -Value 0
+
+    - name: Download Remote.it CLI
+      run: |
+        Invoke-WebRequest -Uri "https://downloads.remote.it/cli/remoteit.cli.exe" -OutFile "remoteit.exe"
+
+    - name: Login to Remote.it
+      run: .\remoteit.exe login $env:REMOTEIT_EMAIL $env:REMOTEIT_PASS
+      env:
+        REMOTEIT_EMAIL: ${{ secrets.REMOTEIT_EMAIL }}
+        REMOTEIT_PASS:  ${{ secrets.REMOTEIT_PASS }}
+
+    - name: Register and Connect RDP Tunnel
+      run: |
+        .\remoteit.exe register --name "github-rdp" --port 3389 --host 127.0.0.1
+        .\remoteit.exe connect --port 3389 --host 127.0.0.1 --name "github-rdp" --background
+
+    - name: Wait for Tunnel Ready
+      run: Start-Sleep -Seconds 30
+
+    - name: Show Tunnel Info
+      run: .\remoteit.exe list
