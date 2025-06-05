@@ -1,0 +1,32 @@
+name: Free RDP with Pagekite
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download Pagekite
+      run: |
+        Invoke-WebRequest -Uri "https://pagekite.net/pk/pagekite.py" -OutFile "pagekite.py"
+        python --version
+      shell: pwsh
+
+    - name: Start Pagekite tunnel
+      id: pagekite
+      run: |
+        python pagekite.py 3389 yoursubdomain.pagekite.me --clean &
+
+        # انتظر 10 ثواني ليشتغل النفق
+        Start-Sleep -Seconds 10
+
+        # حفظ العنوان (في حالة تحتاج جلبه من أي مصدر)
+        echo "Pagekite tunnel started at yoursubdomain.pagekite.me:3389"
+      shell: pwsh
+
+    - name: Show RDP info
+      run: echo "اتصل باستخدام RDP إلى: yoursubdomain.pagekite.me:3389"
