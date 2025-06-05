@@ -17,7 +17,7 @@ jobs:
 
     - name: Download Remote.it CLI
       run: |
-        Invoke-WebRequest -Uri "https://download.remote.it/cli/remoteit.cli.exe" -OutFile "remoteit.exe"
+        Invoke-WebRequest -Uri "https://downloads.remote.it/cli/v3.0.14/remoteit.exe" -OutFile "remoteit.exe"
 
     - name: Login to Remote.it
       run: .\remoteit.exe login $env:REMOTEIT_EMAIL $env:REMOTEIT_PASS
